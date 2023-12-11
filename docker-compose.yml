@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  # NestJS Todo Api
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+      target: dev
+    volumes:
+      - ./backend:/app/api
+      - /app/api/node_modules
+    # dev mode: npm run start:dev / debug: npm run start:debug
+    # command: pnpm run start:dev
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://user:password@postgres:5432/expensesPrisma
+    ports:
+      - "3000:3000"
+  # Database
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: expensesPrisma
+    ports:
+      - 5432:5432
+
+  postgres_admin:
+    image: dpage/pgadmin4:8.0
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - 5050:80
